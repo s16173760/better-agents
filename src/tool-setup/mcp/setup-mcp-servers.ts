@@ -1,6 +1,6 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import type { ProjectConfig } from '../types.js';
+import type { ProjectConfig } from '../../types.js';
 
 type MCPServer = {
   command: string;
@@ -12,10 +12,26 @@ type MCPConfig = {
   mcpServers: Record<string, MCPServer>;
 };
 
-export const setupMCPConfig = async (
-  projectPath: string,
-  config: ProjectConfig
-): Promise<void> => {
+/**
+ * Sets up MCP (Model Context Protocol) server configuration.
+ * 
+ * @param params - Parameters object
+ * @param params.projectPath - Absolute path to project root
+ * @param params.config - Project configuration
+ * @returns Promise that resolves when MCP config is written
+ * 
+ * @example
+ * ```ts
+ * await setupMCPServers({ projectPath: '/path/to/project', config });
+ * ```
+ */
+export const setupMCPServers = async ({ 
+  projectPath, 
+  config 
+}: { 
+  projectPath: string; 
+  config: ProjectConfig; 
+}): Promise<void> => {
   const mcpConfig: MCPConfig = {
     mcpServers: {},
   };
