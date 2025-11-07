@@ -32,6 +32,9 @@ export interface LLMProviderProvider {
   readonly id: string;
   readonly displayName: string;
 
+  /** URL where users can get their API key */
+  readonly apiKeyUrl: string;
+
   /** Optional additional credentials this provider needs (beyond the main API key) */
   readonly additionalCredentials?: CredentialInput[];
 

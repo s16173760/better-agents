@@ -56,6 +56,11 @@ export const collectConfig = async (): Promise<ProjectConfig> => {
     const selectedProvider = allProviders.find((p) => p.id === llmProvider);
     const providerDisplayName = selectedProvider?.displayName || llmProvider;
 
+    if (selectedProvider?.apiKeyUrl) {
+      console.log(chalk.gray(`\nTo get your ${providerDisplayName} API key, visit:`));
+      console.log(chalk.blue.underline(`${selectedProvider.apiKeyUrl}\n`));
+    }
+
     const llmApiKey = await password({
       message: `Enter your ${providerDisplayName} API key:`,
       mask: "*",

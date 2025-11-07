@@ -7,6 +7,7 @@ import type { LLMProviderProvider } from "../index.js";
 export const BedrockProvider: LLMProviderProvider = {
   id: "bedrock",
   displayName: "AWS Bedrock",
+  apiKeyUrl: "https://console.aws.amazon.com/iam/home#/security_credentials",
 
   additionalCredentials: [
     {
