@@ -1,6 +1,6 @@
 import * as fs from "fs/promises";
 import * as path from "path";
-import { execSync } from "child_process";
+import { launchWithTerminalControl } from "../../../utils/process-replacement.js";
 import type { CodingAssistantProvider, MCPConfigFile } from "../index.js";
 
 /**
@@ -18,15 +18,10 @@ export const CursorCodingAssistantProvider: CodingAssistantProvider = {
   },
 
   async launch({ projectPath, prompt }: { projectPath: string; prompt: string }): Promise<void> {
-    // Properly escape the prompt for shell execution
-    const escapedPrompt = prompt.replace(/"/g, '\\"').replace(/\$/g, '\\$').replace(/`/g, '\\`');
-
     try {
-      // Use execSync to run synchronously and hand over full control
-      execSync(`cursor-agent "${escapedPrompt}"`, {
-        cwd: projectPath,
-        stdio: "inherit",
-      });
+      // Launch cursor-agent with full terminal control
+      // This blocks until cursor-agent exits
+      launchWithTerminalControl("cursor-agent", [prompt], { cwd: projectPath });
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(`Failed to launch Cursor CLI: ${error.message}`);
