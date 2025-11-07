@@ -11,6 +11,77 @@ import { kickoffAssistant } from "../assistant-kickoff/kickoff-assistant.js";
 import type { ProjectConfig } from "../types.js";
 
 /**
+ * Creates an animated rainbow banner with moving colors
+ */
+const showAnimatedBanner = (): Promise<void> => {
+  return new Promise((resolve) => {
+    // Define precise RGB colors for a smooth rainbow gradient
+    const colors = [
+      (text: string) => chalk.rgb(255, 0, 0)(text), // Red
+      (text: string) => chalk.rgb(255, 127, 0)(text), // Orange
+      (text: string) => chalk.rgb(255, 255, 0)(text), // Yellow
+      (text: string) => chalk.rgb(0, 255, 0)(text), // Green
+      (text: string) => chalk.rgb(0, 127, 255)(text), // Light Blue
+      (text: string) => chalk.rgb(0, 0, 255)(text), // Blue
+      (text: string) => chalk.rgb(139, 0, 255)(text), // Purple
+      (text: string) => chalk.rgb(255, 0, 255)(text), // Magenta
+    ];
+
+    const superArt = [
+      "  ███████╗██╗   ██╗██████╗ ███████╗██████╗ ",
+      "  ██╔════╝██║   ██║██╔══██╗██╔════╝██╔══██╗",
+      "  ███████╗██║   ██║██████╔╝█████╗  ██████╔╝",
+      "  ╚════██║██║   ██║██╔═══╝ ██╔══╝  ██╔══██╗",
+      "  ███████║╚██████╔╝██║     ███████╗██║  ██║",
+      "  ╚══════╝ ╚═════╝ ╚═╝     ╚══════╝╚═╝  ╚═╝",
+    ];
+
+    const agentsArt = [
+      "   █████╗  ██████╗ ███████╗███╗   ██╗████████╗███████╗",
+      "  ██╔══██╗██╔════╝ ██╔════╝████╗  ██║╚══██╔══╝██╔════╝",
+      "  ███████║██║  ███╗█████╗  ██╔██╗ ██║   ██║   ███████╗",
+      "  ██╔══██║██║   ██║██╔══╝  ██║╚██╗██║   ██║   ╚════██║",
+      "  ██║  ██║╚██████╔╝███████╗██║ ╚████║   ██║   ███████║",
+      "  ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝",
+    ];
+
+    let colorOffset = 0;
+    let frameCount = 0;
+    const maxFrames = 18;
+
+    const interval = setInterval(() => {
+      console.clear();
+      console.log(); // Empty line at top
+
+      // Print SUPER - each line gets one color, colors shift down over time
+      superArt.forEach((line, lineIndex) => {
+        const colorIndex = (colorOffset + lineIndex) % colors.length;
+        console.log(colors[colorIndex](line));
+      });
+
+      console.log(); // Empty line between
+
+      // Print AGENTS - continue the color progression
+      agentsArt.forEach((line, lineIndex) => {
+        const colorIndex =
+          (colorOffset + superArt.length + lineIndex) % colors.length;
+        console.log(colors[colorIndex](line));
+      });
+
+      console.log(); // Empty line at bottom
+
+      colorOffset = (colorOffset - 1 + colors.length) % colors.length;
+      frameCount++;
+
+      if (frameCount >= maxFrames) {
+        clearInterval(interval);
+        resolve();
+      }
+    }, 150);
+  });
+};
+
+/**
  * Initializes a new agent project with best practices.
  *
  * @param targetPath - Path where the project should be created (relative to cwd)
@@ -23,20 +94,12 @@ import type { ProjectConfig } from "../types.js";
  */
 export const initCommand = async (targetPath: string): Promise<void> => {
   try {
-    // ASCII art banner
-    console.log(
-      chalk.cyan(`
-███████╗██╗   ██╗██████╗ ███████╗██████╗  █████╗  ██████╗ ███████╗███╗   ██╗████████╗███████╗
-██╔════╝██║   ██║██╔══██╗██╔════╝██╔══██╗██╔══██╗██╔════╝ ██╔════╝████╗  ██║╚══██╔══╝██╔════╝
-███████╗██║   ██║██████╔╝█████╗  ██████╔╝███████║██║  ███╗█████╗  ██╔██╗ ██║   ██║   ███████╗
-╚════██║██║   ██║██╔═══╝ ██╔══╝  ██╔══██╗██╔══██║██║   ██║██╔══╝  ██║╚██╗██║   ██║   ╚════██║
-███████║╚██████╔╝██║     ███████╗██║  ██║██║  ██║╚██████╔╝███████╗██║ ╚████║   ██║   ███████║
-╚══════╝ ╚═════╝ ╚═╝     ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝
-    `)
-    );
+    // Show animated rainbow banner
+    await showAnimatedBanner();
+
     console.log(
       chalk.bold.gray(
-        "                         Building the future of AI agents\n"
+        "                    Building the future of AI agents\n"
       )
     );
 
