@@ -13,7 +13,12 @@
     "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write 'src/**/*.ts'",
-    "lint": "eslint 'src/**/*.ts'"
+    "lint": "eslint 'src/**/*.ts'",
+    "test": "vitest",
+    "test:unit": "vitest --config vitest.config.ts",
+    "test:e2e": "vitest --config vitest.e2e.config.ts",
+    "test:watch": "vitest --watch",
+    "test:ci": "vitest --run"
   },
   "keywords": [
     "langwatch",
@@ -55,6 +60,7 @@
   "devDependencies": {
     "@types/node": "^22.10.2",
     "tsx": "^4.19.2",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
   }
 }

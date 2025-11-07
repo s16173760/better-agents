@@ -38,32 +38,37 @@ export const spawnCLI = async (params: {
         ...process.env,
         // Disable inquirer's TTY detection to treat stdin as plain input
         NODE_ENV: "test",
+        // Force inquirer to use non-TTY mode
+        CI: "true",
+        // Ensure stdin is not detected as a TTY
+        TERM: "dumb",
       },
+      // Detach from parent's stdio to prevent TTY inheritance
+      detached: false,
     });
 
     let stdout = "";
     let stderr = "";
     let inputIndex = 0;
 
-    let lastOutput = "";
+    let lastOutputLength = 0;
+
     child.stdout?.on("data", (data) => {
       const text = data.toString();
       stdout += text;
-      process.stdout.write(text);
 
-      // Send input when we detect a new complete prompt line
-      const newText = stdout.slice(lastOutput.length);
-      lastOutput = stdout;
+      // Only output to console if DEBUG_CLI env var is set
+      if (process.env.DEBUG_CLI) {
+        process.stdout.write(text);
+      }
 
-      // Detect different prompt types:
-      // - select: "? message" + "⏎ select"
-      // - password: "? message:"
-      // - input: "? message?"
-      const hasPrompt =
-        newText.includes("? ") ||
-        newText.includes(": ") ||
-        newText.includes("⏎ select") ||
-        newText.endsWith("?");
+      // Detect any prompt (inquirer prompts all start with "? ")
+      // We only look at new data since last check to avoid re-triggering
+      const newText = stdout.slice(lastOutputLength);
+      lastOutputLength = stdout.length;
+
+      // If we see a prompt marker and have inputs left to send, send the next one
+      const hasPrompt = newText.includes("? ");
 
       if (inputIndex < inputs.length && hasPrompt) {
         setTimeout(() => {
@@ -78,7 +83,11 @@ export const spawnCLI = async (params: {
     child.stderr?.on("data", (data) => {
       const text = data.toString();
       stderr += text;
-      process.stderr.write(text);
+
+      // Only output to console if DEBUG_CLI env var is set
+      if (process.env.DEBUG_CLI) {
+        process.stderr.write(text);
+      }
     });
 
     child.on("close", (code) => {
