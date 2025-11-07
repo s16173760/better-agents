@@ -15,6 +15,11 @@ export const ClaudeCodingAssistantProvider: CodingAssistantProvider = {
   async writeMCPConfig({ projectPath, config }) {
     const mcpConfigPath = path.join(projectPath, ".mcp.json");
     await fs.writeFile(mcpConfigPath, JSON.stringify(config, null, 2));
+
+    // Create CLAUDE.md that references AGENTS.md
+    const claudeMdPath = path.join(projectPath, "CLAUDE.md");
+    const claudeMdContent = `@AGENTS.md\n`;
+    await fs.writeFile(claudeMdPath, claudeMdContent);
   },
 
   async launch({ projectPath, prompt }: { projectPath: string; prompt: string }): Promise<void> {
