@@ -2,7 +2,7 @@
 
 Superagents is a CLI tool and a set of standards for agent building.
 
-It supercharges your coding assistant (Claude Code, Cursor, etc), making it an expert in any agent framework you choose (Agno, Mastra, etc) and all their best practices.
+It supercharges your coding assistant (Claude Code, Cursor, etc), making it an expert in any agent framework you choose (Agno, Mastra, etc) and all their best practices, being able to autodiscover MCP tools to augment your agent.
 
 The Superagent Structure and AGENTS.md ensures industry best practices, making your agent ready for production:
 - [Scenario](https://github.com/langwatch/scenario) agent tests written for every feature to ensure agent behaviour
@@ -76,9 +76,9 @@ The CLI will guide you through:
 
 1. **Programming Language**: Python or TypeScript
 2. **Agent Framework**: Agno (Python) or Mastra (TypeScript)
-3. **Coding Assistant**: Claude Code, Cursor CLI, Kilocode CLI, or None (manual prompt)
-4. **LLM Provider**: OpenAI
-5. **API Keys**: OpenAI and LangWatch
+3. **Coding Assistant**: Claude Code, Cursor, Kilocode CLI, or None (manual prompt)
+4. **LLM Provider**: OpenAI, Anthropic, Gemini, Bedrock, OpenRouter, or Grok
+5. **API Keys**: LLM Provider and LangWatch (required), Smithery (optional)
 6. **Project Goal**: What you want to build
 
 ## Philosophy
@@ -105,9 +105,15 @@ Learn more: https://scenario.langwatch.ai/best-practices/the-agent-testing-pyram
 - **Evaluations**: Measure component performance
 - **MCP Server**: Expert guidance built into your coding assistant
 
+### 🔧 MCP Tool Integration
+
+- **Smithery Toolbox** (optional): When you provide a Smithery API key during setup, your coding agent gets automatic access to MCP tools for enhanced capabilities
+- Auto-configured in `.mcp.json` for seamless integration
+- Your coding assistant can discover and use tools to help build your agent
+
 ### 🤖 Coding Assistant Setup
 
-Your coding assistant (e.g., Claude Code, Cursor CLI, Kilocode CLI) is:
+Your coding assistant (e.g., Claude Code, Cursor, Kilocode CLI) is:
 - **Automatically launched** after project setup with initial prompt
 - Pre-configured with framework-specific knowledge (via MCP or docs)
 - Loaded with LangWatch best practices
@@ -119,13 +125,14 @@ Your coding assistant (e.g., Claude Code, Cursor CLI, Kilocode CLI) is:
 
 - Node.js 18+
 - npm or pnpm
-- A coding assistant CLI (one of the following):
-  - [Claude Code](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code-agent) (`claude`)
-  - [Cursor CLI](https://www.cursor.com/) (`cursor-agent`)
+- A coding assistant (one of the following):
+  - [Claude Code](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code-agent) (`claude` CLI)
+  - [Cursor](https://www.cursor.com/)
   - [Kilocode CLI](https://www.kilocode.ai/) (`kilocode`)
 - API Keys:
-  - OpenAI API key
+  - Your chosen LLM Provider API key
   - LangWatch API key (get one at https://app.langwatch.ai/authorize)
+  - Smithery API key (optional - for MCP tool auto-discovery, get one at https://smithery.ai/account/api-keys)
 
 ## Development
 

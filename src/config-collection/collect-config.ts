@@ -102,6 +102,26 @@ export const collectConfig = async (): Promise<ProjectConfig> => {
       validate: validateLangWatchKey,
     });
 
+    console.log(chalk.gray("\nTo get your Smithery API key (optional), visit:"));
+    console.log(chalk.blue.underline("https://smithery.ai/account/api-keys\n"));
+    console.log(chalk.gray("Smithery enables your coding agent to auto-discover MCP tools to integrate with your agent.\n"));
+
+    const smitheryApiKey = await password({
+      message: "Enter your Smithery API key (Optional - press Enter to skip):",
+      mask: "*",
+      validate: (value) => {
+        // Optional field - empty is valid
+        if (!value || value.trim() === "") {
+          return true;
+        }
+        // If provided, basic validation
+        if (value.length < 10) {
+          return "Smithery API key must be at least 10 characters";
+        }
+        return true;
+      },
+    });
+
     const projectGoal = await input({
       message: "What is your agent going to do?",
       validate: validateProjectGoal,
@@ -115,6 +135,7 @@ export const collectConfig = async (): Promise<ProjectConfig> => {
       llmApiKey,
       llmAdditionalInputs,
       langwatchApiKey,
+      smitheryApiKey: smitheryApiKey && smitheryApiKey.trim() !== "" ? smitheryApiKey : undefined,
       projectGoal,
     };
   } catch (error) {

@@ -43,7 +43,8 @@ First steps:
 Remember:
 - ALWAYS use LangWatch Prompt CLI for prompts (ask the MCP how)
 - ALWAYS write Scenario tests for new features (ask the MCP how)
+- The LLM and LangWatch API keys are already available in the .env file
 - Test everything before considering it done`;
 
-  return `${instructions}\n\nProject Goal: ${config.projectGoal}`;
+  return `${instructions}\n\nAgent Goal: ${config.projectGoal}`;
 };

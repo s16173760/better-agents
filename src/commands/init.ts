@@ -11,21 +11,59 @@ import { kickoffAssistant } from "../assistant-kickoff/kickoff-assistant.js";
 import type { ProjectConfig } from "../types.js";
 
 /**
- * Creates an animated rainbow banner with moving colors
+ * Creates an animated rainbow banner with moving colors and flying Superman
  */
 const showAnimatedBanner = (): Promise<void> => {
   return new Promise((resolve) => {
-    // Define precise RGB colors for a smooth rainbow gradient
+    // Purple gradient for letters
     const colors = [
-      (text: string) => chalk.rgb(255, 0, 0)(text), // Red
-      (text: string) => chalk.rgb(255, 127, 0)(text), // Orange
-      (text: string) => chalk.rgb(255, 255, 0)(text), // Yellow
-      (text: string) => chalk.rgb(0, 255, 0)(text), // Green
-      (text: string) => chalk.rgb(0, 127, 255)(text), // Light Blue
-      (text: string) => chalk.rgb(0, 0, 255)(text), // Blue
-      (text: string) => chalk.rgb(139, 0, 255)(text), // Purple
-      (text: string) => chalk.rgb(255, 0, 255)(text), // Magenta
+      (text: string) => chalk.ansi256(93)(text), // Light purple
+      (text: string) => chalk.ansi256(92)(text), // Medium-light purple
+      (text: string) => chalk.ansi256(91)(text), // Medium purple
+      (text: string) => chalk.ansi256(127)(text), // Deep purple
+      (text: string) => chalk.ansi256(129)(text), // Purple
+      (text: string) => chalk.ansi256(93)(text), // Light purple (cycle back)
     ];
+
+    // Original Superman art
+    const supermanArtOriginal = [
+      "                                  ",
+      "                                  ",
+      "                  ███░            ",
+      "                █████████         ",
+      "             ░████▒░░█████        ",
+      "             ▓██░░░░░░░█░░█       ",
+      "            ░░░░░░░░░▒░░▒░▒       ",
+      "              ░░░░░░░░░░░░        ",
+      "         ░▓▓▓▓▓▓░░░░░░░░░░▒░░░░   ",
+      "     ▓▓▓▓▓▓░░▓▓▓▓▓▒░░░░▒▓▓▓▓░░    ",
+      "       ▓▓▓▓▓▒▓▓▓░▓░▓▓▓░           ",
+      "        ░▓▓▓▓▓▓░▓▓░░              ",
+      "      ▓▓▓▓▓▓▓▓                    ",
+      "      ▓▓░                         ",
+      "                                  ",
+      "                                  ",
+      "                                  ",
+    ];
+
+    // Reverse shading for better display on dark terminals
+    // Swap light and dark characters so face appears light and hair appears dark
+    const reverseShading = (line: string): string => {
+      return line
+        .split('')
+        .map((char) => {
+          switch (char) {
+            case '░': return '█'; // Light shade → Solid
+            case '▒': return '▓'; // Medium shade → Dark shade
+            case '▓': return '▒'; // Dark shade → Medium shade
+            case '█': return '░'; // Solid → Light shade
+            default: return char;
+          }
+        })
+        .join('');
+    };
+
+    const supermanArt = supermanArtOriginal.map(reverseShading);
 
     const superArt = [
       "  ███████╗██╗   ██╗██████╗ ███████╗██████╗ ",
@@ -53,20 +91,56 @@ const showAnimatedBanner = (): Promise<void> => {
       console.clear();
       console.log(); // Empty line at top
 
-      // Print SUPER - each line gets one color, colors shift down over time
-      superArt.forEach((line, lineIndex) => {
-        const colorIndex = (colorOffset + lineIndex) % colors.length;
-        console.log(colors[colorIndex](line));
-      });
+      // Calculate Superman's vertical offset for flying animation
+      // Using sine wave for smooth up and down motion
+      const flyingOffset = Math.round(
+        2 * Math.sin((frameCount * Math.PI) / 6)
+      );
 
-      console.log(); // Empty line between
+      // Calculate total height: Superman, SUPER, spacing, and AGENTS
+      const totalTextLines = superArt.length + 1 + agentsArt.length; // +1 for spacing
+      const maxLines = Math.max(supermanArt.length, totalTextLines);
 
-      // Print AGENTS - continue the color progression
-      agentsArt.forEach((line, lineIndex) => {
-        const colorIndex =
-          (colorOffset + superArt.length + lineIndex) % colors.length;
-        console.log(colors[colorIndex](line));
-      });
+      for (let i = 0; i < maxLines; i++) {
+        let line = "";
+
+        // Add Superman with flying offset
+        const supermanLineIndex = i - flyingOffset;
+        if (
+          supermanLineIndex >= 0 &&
+          supermanLineIndex < supermanArt.length
+        ) {
+          line += supermanArt[supermanLineIndex]; // Use default terminal color
+        } else {
+          // Add empty space when Superman line is out of bounds
+          line += " ".repeat(supermanArt[0].length);
+        }
+
+        // Add spacing between Superman and text
+        line += "  ";
+
+        // Push text down by 2 lines
+        const textLineIndex = i - 2;
+
+        // Add SUPER text (starting at line 2)
+        if (textLineIndex >= 0 && textLineIndex < superArt.length) {
+          const colorIndex = (colorOffset + textLineIndex) % colors.length;
+          line += colors[colorIndex](superArt[textLineIndex]);
+        }
+        // Add empty line between SUPER and AGENTS
+        else if (textLineIndex === superArt.length) {
+          // Just spacing, no text
+        }
+        // Add AGENTS text
+        else if (textLineIndex > superArt.length && textLineIndex - superArt.length - 1 < agentsArt.length) {
+          const agentsLineIndex = textLineIndex - superArt.length - 1;
+          const colorIndex =
+            (colorOffset + superArt.length + agentsLineIndex) % colors.length;
+          line += colors[colorIndex](agentsArt[agentsLineIndex]);
+        }
+
+        console.log(line);
+      }
 
       console.log(); // Empty line at bottom
 

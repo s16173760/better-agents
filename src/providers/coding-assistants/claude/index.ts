@@ -23,13 +23,17 @@ export const ClaudeCodingAssistantProvider: CodingAssistantProvider = {
   },
 
   async launch({ projectPath, prompt }: { projectPath: string; prompt: string }): Promise<void> {
+    const chalk = (await import("chalk")).default;
+
     try {
+      console.log(chalk.bold.cyan(`🤖 Launching ${this.displayName}...\n`));
       // Launch claude with full terminal control
       // This blocks until claude exits
       launchWithTerminalControl("claude", [prompt], { cwd: projectPath });
+      console.log(chalk.bold.green('\n✨ Session complete!\n'));
     } catch (error) {
       if (error instanceof Error) {
-        throw new Error(`Failed to launch Claude Code: ${error.message}`);
+        console.error(chalk.red(`\n❌ Failed to launch ${this.displayName}: ${error.message}`));
       }
       throw error;
     }

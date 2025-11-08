@@ -1,33 +1,34 @@
 import * as fs from "fs/promises";
 import * as path from "path";
-import { launchWithTerminalControl } from "../../../utils/process-replacement.js";
 import type { CodingAssistantProvider, MCPConfigFile } from "../index.js";
 
 /**
- * Cursor CLI assistant provider implementation.
- * Writes MCP configuration as .mcp.json in project root.
+ * Cursor assistant provider implementation.
+ * Writes MCP configuration as .cursor/mcp.json in project root.
  */
 export const CursorCodingAssistantProvider: CodingAssistantProvider = {
-  id: "cursor-cli",
-  displayName: "Cursor CLI",
-  command: "cursor-agent",
+  id: "cursor",
+  displayName: "Cursor",
+  command: "",
 
   async writeMCPConfig({ projectPath, config }) {
-    const mcpConfigPath = path.join(projectPath, ".mcp.json");
+    // Create .cursor directory
+    const cursorDir = path.join(projectPath, ".cursor");
+    await fs.mkdir(cursorDir, { recursive: true });
+
+    // Write MCP config to .cursor/mcp.json
+    const mcpConfigPath = path.join(cursorDir, "mcp.json");
     await fs.writeFile(mcpConfigPath, JSON.stringify(config, null, 2));
   },
 
   async launch({ projectPath, prompt }: { projectPath: string; prompt: string }): Promise<void> {
-    try {
-      // Launch cursor-agent with full terminal control
-      // This blocks until cursor-agent exits
-      launchWithTerminalControl("cursor-agent", [prompt], { cwd: projectPath });
-    } catch (error) {
-      if (error instanceof Error) {
-        throw new Error(`Failed to launch Cursor CLI: ${error.message}`);
-      }
-      throw error;
-    }
+    const chalk = (await import("chalk")).default;
+
+    // Cursor doesn't support CLI launching, show instructions instead
+    console.log(chalk.yellow('To start with Cursor:\n'));
+    console.log(chalk.cyan(`  1. Open Cursor`));
+    console.log(chalk.cyan(`  2. Open the folder: ${projectPath}`));
+    console.log(chalk.cyan(`  3. Use the initial prompt above with Cursor Composer\n`));
   },
 };
 

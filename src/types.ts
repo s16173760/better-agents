@@ -1,6 +1,6 @@
 export type ProgrammingLanguage = 'python' | 'typescript';
 export type AgentFramework = 'agno' | 'mastra';
-export type CodingAssistant = 'claude-code' | 'cursor-cli' | 'kilocode' | 'none';
+export type CodingAssistant = 'claude-code' | 'cursor' | 'kilocode' | 'none';
 export type LLMProvider = 'openai' | 'anthropic' | 'gemini' | 'bedrock' | 'openrouter' | 'grok';
 
 export type ProjectConfig = {
@@ -11,6 +11,7 @@ export type ProjectConfig = {
   llmApiKey: string;
   llmAdditionalInputs?: Record<string, string>;
   langwatchApiKey: string;
+  smitheryApiKey?: string;
   projectGoal: string;
 };
 

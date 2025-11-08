@@ -18,13 +18,17 @@ export const KilocodeCodingAssistantProvider: CodingAssistantProvider = {
   },
 
   async launch({ projectPath, prompt }: { projectPath: string; prompt: string }): Promise<void> {
+    const chalk = (await import("chalk")).default;
+
     try {
+      console.log(chalk.bold.cyan(`🤖 Launching ${this.displayName}...\n`));
       // Launch kilocode with full terminal control
       // This blocks until kilocode exits
       launchWithTerminalControl("kilocode", [prompt], { cwd: projectPath });
+      console.log(chalk.bold.green('\n✨ Session complete!\n'));
     } catch (error) {
       if (error instanceof Error) {
-        throw new Error(`Failed to launch Kilocode CLI: ${error.message}`);
+        console.error(chalk.red(`\n❌ Failed to launch ${this.displayName}: ${error.message}`));
       }
       throw error;
     }

@@ -42,7 +42,7 @@ export interface CodingAssistantProvider {
 
 const PROVIDERS: Record<string, CodingAssistantProvider> = {
   "claude-code": ClaudeCodingAssistantProvider,
-  "cursor-cli": CursorCodingAssistantProvider,
+  cursor: CursorCodingAssistantProvider,
   kilocode: KilocodeCodingAssistantProvider,
   none: NoneCodingAssistantProvider,
 };

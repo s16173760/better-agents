@@ -76,10 +76,11 @@ const langwatch = new LangWatch({
 });
 
 const prompt = await langwatch.prompts.get("my_prompt")
-Agent(prompt=prompt?.prompt || "")
+Agent(prompt=prompt!.prompt)
 \`\`\`
 
-Prompt fetching is very reliable, there is no need to try/catch around it.
+Prompt fetching is very reliable when using the prompts cli because the files are local (double check they were created with the CLI and are listed on the prompts.json file).
+DO NOT add try/catch around it and DO NOT duplicate the prompt here as a fallback
 
 Explore the prompt management get started and data model docs if you need more advanced usages such as compiled prompts with variables or messages list.
 
