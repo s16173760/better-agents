@@ -1,7 +1,7 @@
-import type { Logger as PinoLogger } from 'pino';
-import pino from 'pino';
-import chalk from 'chalk';
-import ora from 'ora';
+import type { Logger as PinoLogger } from "pino";
+import pino from "pino";
+import chalk from "chalk";
+import ora from "ora";
 
 /**
  * Context data for debug logging operations.
@@ -12,7 +12,7 @@ export type LogContext = Record<string, unknown>;
 /**
  * Known log levels for structured logging.
  */
-export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+export type LogLevel = "debug" | "info" | "warn" | "error";
 
 /**
  * Unified logging interface for Superagents.
@@ -144,23 +144,27 @@ export class UnifiedLogger implements Logger {
   constructor(projectPath?: string) {
     this.isDebugMode = this.detectDebugMode();
 
-    // Console transport only in debug mode to avoid conflicts with spinners
-    const transports = this.isDebugMode ? [{
-      target: 'pino-pretty',
-      options: {
-        colorize: true,
-        translateTime: 'HH:MM:ss',
-        ignore: 'pid,hostname'
-      }
-    }] : [];
+    // Console transport only when --debug flag is explicitly passed
+    const transports = this.isDebugMode
+      ? [
+          {
+            target: "pino-pretty",
+            options: {
+              colorize: true,
+              translateTime: "HH:MM:ss",
+              ignore: "pid,hostname",
+            },
+          },
+        ]
+      : [];
 
     this.pinoLogger = pino({
-      level: this.isDebugMode ? 'debug' : 'silent',
-      ...(transports.length > 0 && { transport: { targets: transports } })
+      level: this.isDebugMode ? "debug" : "silent",
+      ...(transports.length > 0 && { transport: { targets: transports } }),
     });
 
-    // Setup project-specific JSON logging in debug mode
-    if (projectPath && this.isDebugMode) {
+    // Always setup project-specific JSON logging with timestamped files
+    if (projectPath) {
       this.setupProjectLogging(projectPath);
     }
   }
@@ -171,36 +175,43 @@ export class UnifiedLogger implements Logger {
   private detectDebugMode(): boolean {
     return Boolean(
       process.env.SUPERAGENTS_DEBUG ||
-      process.argv.includes('--debug') ||
-      process.argv.includes('-d')
+        process.argv.includes("--debug") ||
+        process.argv.includes("-d")
     );
   }
 
   /**
-   * Sets up project-specific JSON logging to a debug.log file.
+   * Sets up project-specific JSON logging to a timestamped debug log file.
    */
   private async setupProjectLogging(projectPath: string): Promise<void> {
     try {
-      const fs = await import('fs/promises');
-      const path = await import('path');
+      const fs = await import("fs/promises");
+      const path = await import("path");
 
-      const logDir = path.join(projectPath, '.superagents');
-      const logPath = path.join(logDir, 'debug.log');
+      const logDir = path.join(projectPath, ".superagents");
+
+      // Create timestamped log file name: debug-YYYY-MM-DD-HH-MM-SS.log
+      const now = new Date();
+      const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);
+      const logPath = path.join(logDir, `debug-${timestamp}.log`);
 
       await fs.mkdir(logDir, { recursive: true });
 
-      this.projectLogger = pino({
-        level: 'debug',
-        formatters: {
-          level: (label: string) => ({
-            level: label,
-            timestamp: new Date().toISOString()
-          })
-        }
-      }, pino.destination(logPath));
+      this.projectLogger = pino(
+        {
+          level: "debug",
+          formatters: {
+            level: (label: string) => ({
+              level: label,
+              timestamp: new Date().toISOString(),
+            }),
+          },
+        },
+        pino.destination(logPath)
+      );
     } catch (error) {
       // Silently fail project logging setup - don't break user experience
-      console.warn('Failed to setup project debug logging:', error);
+      console.warn("Failed to setup project debug logging:", error);
     }
   }
 
@@ -210,7 +221,7 @@ export class UnifiedLogger implements Logger {
     } else {
       console.log(chalk.cyan(message));
     }
-    this.debug('user-info', { message, type: 'info' });
+    this.debug("user-info", { message, type: "info" });
   }
 
   userSuccess(message: string): void {
@@ -219,7 +230,7 @@ export class UnifiedLogger implements Logger {
     } else {
       console.log(chalk.green(`✅ ${message}`));
     }
-    this.debug('user-success', { message, type: 'success' });
+    this.debug("user-success", { message, type: "success" });
   }
 
   userError(message: string): void {
@@ -228,7 +239,7 @@ export class UnifiedLogger implements Logger {
     } else {
       console.error(chalk.red(`❌ ${message}`));
     }
-    this.debug('user-error', { message, type: 'error' });
+    this.debug("user-error", { message, type: "error" });
   }
 
   userWarning(message: string): void {
@@ -237,7 +248,7 @@ export class UnifiedLogger implements Logger {
     } else {
       console.warn(chalk.yellow(`⚠️  ${message}`));
     }
-    this.debug('user-warning', { message, type: 'warning' });
+    this.debug("user-warning", { message, type: "warning" });
   }
 
   debug(step: string, context: LogContext = {}): void {
@@ -254,10 +265,10 @@ export class UnifiedLogger implements Logger {
 
   error(error: Error, context: LogContext = {}): void {
     const logData = {
-      step: 'error',
+      step: "error",
       error: error.message,
       stack: error.stack,
-      ...context
+      ...context,
     };
     this.pinoLogger?.error(logData);
     this.projectLogger?.error(logData);
@@ -266,12 +277,12 @@ export class UnifiedLogger implements Logger {
   startTimer(label: string): () => number {
     const start = Date.now();
     this.timers.set(label, start);
-    this.debug('timer-start', { label });
+    this.debug("timer-start", { label });
 
     return () => {
       const duration = Date.now() - start;
       this.timers.delete(label);
-      this.debug('timer-end', { label, duration });
+      this.debug("timer-end", { label, duration });
       return duration;
     };
   }
