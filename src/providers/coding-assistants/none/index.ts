@@ -1,6 +1,6 @@
 import * as fs from "fs/promises";
 import * as path from "path";
-import { logger } from "../../../utils/logger.js";
+import { logger } from "../../../utils/logger/index.js";
 import type { CodingAssistantProvider } from "../index.js";
 
 /**

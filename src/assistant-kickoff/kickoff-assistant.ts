@@ -1,5 +1,5 @@
 import type { ProjectConfig } from '../types.js';
-import { logger } from '../utils/logger.js';
+import { logger } from '../utils/logger/index.js';
 import { buildInitialPrompt } from './build-initial-prompt.js';
 import { getCodingAssistantProvider } from '../providers/coding-assistants/index.js';
 

@@ -7,7 +7,7 @@ import type {
   CodingAssistant,
   LLMProvider,
 } from "../types.js";
-import { logger } from "../utils/logger.js";
+import { logger } from "../utils/logger/index.js";
 import { buildLanguageChoices } from "./choice-builders/language-choices.js";
 import { buildFrameworkChoices } from "./choice-builders/framework-choices.js";
 import { buildCodingAssistantChoices } from "./choice-builders/coding-assistant-choices.js";
@@ -30,7 +30,9 @@ import { validateProjectGoal } from "./validators/project-goal.js";
  */
 export const collectConfig = async (): Promise<ProjectConfig> => {
   try {
-    logger.userInfo("Setting up your agent project following the Superagent Structure.");
+    logger.userInfo(
+      "Setting up your agent project following the Superagent Structure."
+    );
 
     const language = await select({
       message: "What programming language do you want to use?",
@@ -66,7 +68,9 @@ export const collectConfig = async (): Promise<ProjectConfig> => {
     if (selectedCodingProvider) {
       let availability = await selectedCodingProvider.isAvailable();
       if (!availability.installed && availability.installCommand) {
-        logger.userWarning(`${selectedCodingProvider.displayName} is not installed.`);
+        logger.userWarning(
+          `${selectedCodingProvider.displayName} is not installed.`
+        );
         logger.userInfo(`To install it, run:`);
         logger.userInfo(`${availability.installCommand}`);
 
@@ -98,14 +102,20 @@ export const collectConfig = async (): Promise<ProjectConfig> => {
             // Check availability again after installation
             availability = await selectedCodingProvider.isAvailable();
             if (availability.installed) {
-              logger.userSuccess(`${selectedCodingProvider.displayName} installed successfully!`);
+              logger.userSuccess(
+                `${selectedCodingProvider.displayName} installed successfully!`
+              );
             } else {
-              logger.userError("Installation may have failed. Please try installing manually.");
+              logger.userError(
+                "Installation may have failed. Please try installing manually."
+              );
             }
           } catch (error) {
-            logger.userError(`Installation failed: ${
-              error instanceof Error ? error.message : "Unknown error"
-            }`);
+            logger.userError(
+              `Installation failed: ${
+                error instanceof Error ? error.message : "Unknown error"
+              }`
+            );
             logger.userInfo("Please try installing manually.");
           }
         } else {

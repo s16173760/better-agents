@@ -2,7 +2,7 @@ import * as fs from "fs/promises";
 import * as path from "path";
 import { ProcessUtils } from "../../../utils/process.util";
 import { CliUtils } from "../../../utils/cli.util";
-import { logger } from "../../../utils/logger.js";
+import { logger } from "../../../utils/logger/index.js";
 import type { CodingAssistantProvider } from "../index.js";
 
 /**
@@ -47,7 +47,9 @@ export const KilocodeCodingAssistantProvider: CodingAssistantProvider = {
       logger.userSuccess("Session complete!");
     } catch (error) {
       if (error instanceof Error) {
-        logger.userError(`Failed to launch ${this.displayName}: ${error.message}`);
+        logger.userError(
+          `Failed to launch ${this.displayName}: ${error.message}`
+        );
       }
       throw error;
     }

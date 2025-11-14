@@ -8,7 +8,7 @@ import { getFrameworkProvider } from "../providers/frameworks/index.js";
 import { buildAgentsGuide } from "../builders/agents-guide-builder.js";
 import { buildMCPConfig } from "../builders/mcp-config-builder.js";
 import { kickoffAssistant } from "../assistant-kickoff/kickoff-assistant.js";
-import { UnifiedLogger } from "../utils/logger.js";
+import { LoggerFacade } from "../utils/logger/logger-facade.js";
 import type { ProjectConfig } from "../types.js";
 
 /**
@@ -176,7 +176,7 @@ export const initCommand = async (targetPath: string, debug = false): Promise<vo
   }
 
   // Create project-specific logger for debug logging
-  const logger = new UnifiedLogger();
+  const logger = new LoggerFacade();
 
   try {
     // Show animated rainbow banner
@@ -191,7 +191,7 @@ export const initCommand = async (targetPath: string, debug = false): Promise<vo
     const absolutePath = path.resolve(process.cwd(), targetPath);
 
     // Create project-specific logger now that we have the path
-    const projectLogger = new UnifiedLogger(absolutePath);
+    const projectLogger = new LoggerFacade(absolutePath);
 
     // Start spinner using logger's spinner management
     const spinner = projectLogger.startSpinner("Setting up your agent project...");
