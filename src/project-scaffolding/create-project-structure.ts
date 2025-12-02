@@ -1,7 +1,6 @@
 import type { ProjectConfig } from "../types.js";
 import { createDirectories } from "./create-directory-structure.js";
 import { generateEnvFiles } from "./file-generators/env-files.js";
-import { generateGitignore } from "./file-generators/gitignore-generator.js";
 import { generateSamplePrompt } from "./file-generators/sample-prompt-file.js";
 import { generateSampleEvaluation } from "./file-generators/sample-evaluation.js";
 import { generateSampleScenario } from "./file-generators/sample-scenario-test.js";
@@ -9,6 +8,7 @@ import { generateMainEntryPoint } from "./file-generators/main-entry-point.js";
 
 /**
  * Creates complete project structure including directories and starter files.
+ * Note: .gitignore is handled separately after framework setup via ensureGitignore.
  *
  * @param params - Parameters object
  * @param params.projectPath - Absolute path to project root
@@ -34,7 +34,6 @@ export const createProjectStructure = async ({
     config,
   });
 
-  await generateGitignore({ projectPath });
   await generateSamplePrompt({ projectPath });
   await generateSampleEvaluation({ projectPath, language: config.language });
   await generateSampleScenario({ projectPath, language: config.language });

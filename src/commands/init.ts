@@ -2,6 +2,7 @@ import * as fs from "fs/promises";
 import * as path from "path";
 import { collectConfig } from "../config-collection/collect-config.js";
 import { createProjectStructure } from "../project-scaffolding/create-project-structure.js";
+import { ensureGitignore } from "../project-scaffolding/file-generators/gitignore-generator.js";
 import { getFrameworkProvider } from "../providers/frameworks/index.js";
 import { buildAgentsGuide } from "../builders/agents-guide-builder.js";
 import { buildMCPConfig } from "../builders/mcp-config-builder.js";
@@ -104,6 +105,10 @@ export const initCommand = async (targetPath: string, debug = false): Promise<vo
       await frameworkProvider.setup({ projectPath: absolutePath });
       frameworkTimer();
       spinner.text = "Framework configuration set up";
+
+      // Ensure .gitignore exists and has .better-agents entry
+      // (run after framework setup as some frameworks create their own .gitignore)
+      await ensureGitignore({ projectPath: absolutePath });
 
       // Build MCP config and set up all editor configurations
       const editorTimer = projectLogger.startTimer('editor-setup');

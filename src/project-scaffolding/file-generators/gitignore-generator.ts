@@ -1,25 +1,10 @@
 import * as fs from "fs/promises";
 import * as path from "path";
 
-/**
- * Generates .gitignore file with common patterns for agent projects.
- *
- * @param params - Parameters object
- * @param params.projectPath - Absolute path to project root
- * @returns Promise that resolves when file is written
- *
- * @example
- * ```ts
- * await generateGitignore({ projectPath: '/path/to/project' });
- * ```
- */
-export const generateGitignore = async ({
-  projectPath,
-}: {
-  projectPath: string;
-}): Promise<void> => {
-  const gitignoreContent = `# Environment variables
+const DEFAULT_GITIGNORE = `# Environment variables
 .env
+.env.local
+.env.*.local
 
 # Dependencies
 node_modules/
@@ -42,7 +27,47 @@ Thumbs.db
 dist/
 build/
 *.egg-info/
+
+# Better Agents
+.better-agents/
 `;
 
-  await fs.writeFile(path.join(projectPath, ".gitignore"), gitignoreContent);
+/**
+ * Ensures .gitignore exists and contains Better Agents entries.
+ * If .gitignore exists, appends ".better-agents/" if not already present.
+ * If .gitignore doesn't exist, creates a default one with common patterns.
+ *
+ * @param params - Parameters object
+ * @param params.projectPath - Absolute path to project root
+ * @returns Promise that resolves when file is updated/created
+ *
+ * @example
+ * ```ts
+ * await ensureGitignore({ projectPath: '/path/to/project' });
+ * ```
+ */
+export const ensureGitignore = async ({
+  projectPath,
+}: {
+  projectPath: string;
+}): Promise<void> => {
+  const gitignorePath = path.join(projectPath, ".gitignore");
+
+  try {
+    // Try to read existing .gitignore
+    const existingContent = await fs.readFile(gitignorePath, "utf-8");
+
+    // Check if .better-agents is already in there
+    if (!existingContent.includes(".better-agents")) {
+      // Append Better Agents section
+      const appendContent = `
+# Better Agents
+.better-agents/
+`;
+      await fs.appendFile(gitignorePath, appendContent);
+    }
+  } catch {
+    // File doesn't exist, create default
+    await fs.writeFile(gitignorePath, DEFAULT_GITIGNORE);
+  }
 };
