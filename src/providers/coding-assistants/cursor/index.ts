@@ -1,14 +1,26 @@
+import { ProcessUtils } from "../../../utils/process.util.js";
 import { logger } from "../../../utils/logger/index.js";
 import type { CodingAssistantProvider } from "../index.js";
+import * as os from "os";
+
+/**
+ * Checks if we're running on macOS.
+ *
+ * @returns true if running on macOS, false otherwise
+ */
+const isMac = (): boolean => {
+  return os.platform() === "darwin";
+};
 
 /**
  * Cursor assistant provider implementation.
- * Handles availability checking and launch instructions for Cursor IDE.
+ * Handles availability checking and launching Cursor CLI.
+ * On Mac, launches cursor-agent directly. On Windows/WSL, shows manual instructions.
  */
 export const CursorCodingAssistantProvider: CodingAssistantProvider = {
   id: "cursor",
   displayName: "Cursor",
-  command: "",
+  command: "cursor-agent",
 
   async isAvailable(): Promise<{
     installed: boolean;
@@ -19,12 +31,30 @@ export const CursorCodingAssistantProvider: CodingAssistantProvider = {
   },
 
   async launch({
+    projectPath,
     targetPath,
+    prompt,
   }: {
     projectPath: string;
     targetPath: string;
     prompt: string;
   }): Promise<void> {
+    // On Mac, try to launch cursor-agent directly
+    if (isMac()) {
+      try {
+        logger.userInfo(`🤖 Launching ${this.displayName}...`);
+        ProcessUtils.launchWithTerminalControl("cursor-agent", [prompt], {
+          cwd: projectPath,
+        });
+        logger.userSuccess("Session complete!");
+        return;
+      } catch {
+        logger.userWarning(`Could not auto-launch ${this.displayName}.`);
+        // Fall through to show manual instructions
+      }
+    }
+
+    // On Windows/WSL or if launch failed, show manual instructions
     const isCurrentDir = targetPath === ".";
 
     logger.userPlain('');
